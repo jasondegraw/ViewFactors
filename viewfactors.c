@@ -20,7 +20,7 @@
 /*    c - separation distance            +---------------------+              */
 /*                                                                            */
 /******************************************************************************/
-double identicalAlignedParallelRectangles(double X, double Y)
+double identicalAlignedParallelRects(double X, double Y)
 {
   double X2,Y2,sqrt1pX2,sqrt1pY2;
   X2 = X*X;
@@ -32,6 +32,39 @@ double identicalAlignedParallelRectangles(double X, double Y)
 	       + Y*sqrt1pX2*atan(Y/sqrt1pX2)
 	       - X*atan(X)
 	       - Y*atan(Y) )/(M_PI*X*Y);
+}
+
+/******************************************************************************/
+/*                                                                            */
+/*  Identical aligned parallel plates                                         */
+/*                                           +---------------------+          */
+/*  Hamilton and Morgan (1952), A-1         /                     /           */
+/*  Howell catalog, C-11                   /                   b /            */
+/*  Modest (2013), Configuration 38       /         a           /             */
+/*                                       +---------------------+              */
+/*  Arguments:                           |                                    */
+/*    a - length of plates               |                                    */
+/*    b - width of plates              c |   +---------------------+          */
+/*    c - separation distance            |  /                     /           */
+/*                                       | /                   b /            */
+/*                                       |/         a           /             */
+/*                                       +---------------------+              */
+/*                                                                            */
+/******************************************************************************/
+double identicalAlignedParallelRects1(double a, double b, double c)
+{
+  double X2,Y2,sqrt1pX2,sqrt1pY2;
+  double X = a/c;
+  double Y = b/c;
+  X2 = X*X;
+  Y2 = Y*Y;
+  sqrt1pX2 = sqrt(1.0+X2);
+  sqrt1pY2 = sqrt(1.0+Y2);
+  return 2.0*( 0.5*log((1.0+X2)*(1.0+Y2)/(1+X2+Y2))
+           + X*sqrt1pY2*atan(X/sqrt1pY2)
+           + Y*sqrt1pX2*atan(Y/sqrt1pX2)
+           - X*atan(X)
+           - Y*atan(Y) )/(M_PI*X*Y);
 }
 
 /******************************************************************************/
@@ -51,7 +84,7 @@ double identicalAlignedParallelRectangles(double X, double Y)
 /*    h,w - width of plates                +---------------------+            */
 /*                                                                            */
 /******************************************************************************/
-double perpendicularCommonEdgeRectangles(double H, double W)
+double perpCommonEdgeRects(double H, double W)
 {
 	double H2 = H*H;
 	double W2 = W*W;
@@ -83,7 +116,7 @@ double perpendicularCommonEdgeRectangles(double H, double W)
 /*                                         +---------------------+            */
 /*                                                                            */
 /******************************************************************************/
-double perpendicularCommonEdgeRectangles(double w, double h, double l)
+double perpCommonEdgeRects1(double w, double h, double l)
 {
 	double H, W, H2, W2, H2pW2, H2pW2p1, H2p1, W2p1, rootH2pW2;
 	if(w*l*h <= 0.0)
@@ -114,6 +147,9 @@ double perpendicularCommonEdgeRectangles(double w, double h, double l)
 /*  Howell catalog, B-106                                                     */
 /*                                                                            */
 /*  Arguments:                                                                */
+/*    X = a/c                                                                 */
+/*    Y = b/c;                                                                */
+/*  where:                                                                    */
 /*    a - height of plate                                                     */
 /*    b - width of plate                                                      */
 /*    c - separation distance                                                 */
@@ -123,7 +159,7 @@ double perpendicularCommonEdgeRectangles(double w, double h, double l)
 /*      b/  |_                                                                */
 /*      /   | |                                                               */
 /*     /    +-----------------------+                                         */
-/*    |    /                     /_/                                          */
+/*    |  A /                     /_/                                          */
 /*    |   /                       /      The sphere is placed at "o" and      */
 /*   a|  /                       /       the target plane is "c" away and     */
 /*    | /_                      /        "a" by "b" in size.                  */
@@ -132,11 +168,71 @@ double perpendicularCommonEdgeRectangles(double w, double h, double l)
 /*                                                                            */
 /*                                                                            */
 /******************************************************************************/
-double differentialSphereToAlignedPlaneRectangle(double a, double b, double c)
+double diffSphereToAlignedRect(double X, double Y)
+{
+  return 0.25*atan(X*Y/sqrt(1.0+X*X+Y*Y))/M_PI;
+}
+
+/******************************************************************************/
+/*                                                                            */
+/*  Differential sphere to aligned plane rectangle                            */
+/*                                                                            */
+/*  (Sphere is on perpendicular ray from one corner of the rectangle, which   */
+/*   is a 90 degree angle in Howell's formula)                                */
+/*                                                                            */
+/*  Hamilton and Morgan (1952), P-5                                           */
+/*  Howell catalog, B-106                                                     */
+/*                                                                            */
+/*  Arguments:                                                                */
+/*    a - height of plate                                                     */
+/*    b - width of plate                                                      */
+/*    c - separation distance                                                 */
+/*                                                                            */
+/*         /|                                                                 */
+/*        / |                                                                 */
+/*      b/  |_                                                                */
+/*      /   | |                                                               */
+/*     /    +-----------------------+                                         */
+/*    |  A /                     /_/                                          */
+/*    |   /                       /      The sphere is placed at "o" and      */
+/*   a|  /                       /       the target plane is "c" away and     */
+/*    | /_                      /        "a" by "b" in size.                  */
+/*    |/ /       c             /                                              */
+/*    +-----------------------o                                               */
+/*                                                                            */
+/*                                                                            */
+/******************************************************************************/
+double diffSphereToAlignedRect1(double a, double b, double c)
 {
   double X = a/c;
   double Y = b/c;
   return 0.25*atan(X*Y/sqrt(1.0+X*X+Y*Y))/M_PI;
+}
+
+/******************************************************************************/
+/*                                                                            */
+/*  Differential planar element to aligned plane rectangle                    */
+/*                                                                            */
+/*  (Diffential element is aligned with one corner of the rectangle)          */
+/*                                                                            */
+/*  Hamilton and Morgan (1952), P-1                                           */
+/*  Howell catalog, B-3                                                       */
+/*                                                                            */
+/*  Arguments:                                                                */
+/*    A = a/c                                                                 */
+/*    B = b/c                                                                 */
+/*  where:                                                                    */
+/*    a - length of plate                                                     */
+/*    b - width of plate                                                      */
+/*    c - separation distance                                                 */
+/*                                                                            */
+/******************************************************************************/
+double diffPlaneToParallelRect(double A, double B)
+{
+  double rA,rB;
+  rA = 1.0/sqrt(1.0+A*A);
+  rB = 1.0/sqrt(1.0+B*B);
+  return 0.5*(A*atan(B*rA)*rA + B*atan(A*rB)*rB)/M_PI;
 }
 
 /******************************************************************************/
@@ -154,7 +250,7 @@ double differentialSphereToAlignedPlaneRectangle(double a, double b, double c)
 /*    c - separation distance                                                 */
 /*                                                                            */
 /******************************************************************************/
-double differentialPlaneToParallelPlaneRectangle(double a, double b, double c)
+double diffPlaneToParallelRect1(double a, double b, double c)
 {
   double A = a/c;
   double B = b/c;
@@ -174,12 +270,41 @@ double differentialPlaneToParallelPlaneRectangle(double a, double b, double c)
 /*  Howell catalog, B-31                                                      */
 /*                                                                            */
 /*  Arguments:                                                                */
+/*    L = l/r                                                                 */
+/*    H = h/r                                                                 */
+/*  where:                                                                    */
 /*    r - radius of cylinder                                                  */
 /*    l - length of cylinder                                                  */
 /*    h - distance between plane and cylinder axis                            */
 /*                                                                            */
 /******************************************************************************/
-double differentialPlaneToFiniteCylinder(double r, double l, double h)
+double diffPlaneToFiniteCyl(double L, double H)
+{
+  double Hm1 = H-1.0;
+  double Hp1 = H+1.0;
+  double X = Hp1*Hp1 + L*L;
+  double Y = Hm1*Hm1 + L*L;
+  return (atan(L/sqrt(Hp1*Hm1))/H
+      + L*((X-2.0*H)*atan(sqrt(X*Hm1/(Y*Hp1)))/(H*sqrt(X*Y))
+           - atan(sqrt(Hm1/Hp1))/H))/M_PI;
+}
+
+/******************************************************************************/
+/*                                                                            */
+/*  Differential planar element to aligned finite cylinder                    */
+/*                                                                            */
+/*  (Diffential element is aligned with one end of the cylinder)              */
+/*                                                                            */
+/*  Hamilton and Morgan (1952), P-8                                           */
+/*  Howell catalog, B-31                                                      */
+/*                                                                            */
+/*  Arguments:                                                                */
+/*    r - radius of cylinder                                                  */
+/*    l - length of cylinder                                                  */
+/*    h - distance between plane and cylinder axis                            */
+/*                                                                            */
+/******************************************************************************/
+double diffPlaneToFiniteCyl1(double r, double l, double h)
 {
   double L = l/r;
   double H = h/r;
